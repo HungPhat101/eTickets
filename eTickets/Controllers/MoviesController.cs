@@ -27,6 +27,7 @@ namespace eTickets.Controllers
         public async Task<IActionResult> Index()
         {
             var allMovies = await _service.GetAllAsync(n => n.Cinema);
+
             return View(allMovies);
         }
 
@@ -52,6 +53,23 @@ namespace eTickets.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var movieDetail = await _service.GetMovieByIdAsync(id);
+            if (movieDetail == null)
+            {
+                return NotFound();
+            }
+            string baseUrl = " https://33bb-112-197-18-98.ngrok-free.app";
+            // ✅ Tạo URL tuyệt đối cho trang chi tiết phim
+            string movieUrl = $"{baseUrl}{Url.Action("Details", "Movies", new { id = movieDetail.Id })}";
+
+            // ✅ Lấy đường dẫn ảnh từ movieDetail
+            string imageUrl = movieDetail.ImageURL ?? string.Empty; // Kiểm tra null tránh lỗi
+
+            // ✅ Kiểm tra và thay thế HTTP bằng HTTPS nếu cần
+            if (imageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            {
+                imageUrl = "https://" + imageUrl.Substring(7);
+            }
+
             return View(movieDetail);
         }
 
